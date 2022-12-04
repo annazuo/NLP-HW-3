@@ -1,0 +1,6 @@
+datasets
+conllu
+spacy
+torch
+transformers
+scipy
