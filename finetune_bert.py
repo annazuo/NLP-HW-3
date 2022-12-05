@@ -56,8 +56,8 @@ def preprocessing(dataset='train', rel_pos_mapper=None, deprel_mapper=None):
 
     # make a relative position vocab and dependency vocab
     if dataset == 'train':
-        rel_pos_vocab = ['pad', 'bos', 'eos', 'unk']
-        deprel_vocab = ['pad', 'bos', 'eos', 'unk']
+        rel_pos_vocab = ['pad', 'unk']
+        deprel_vocab = ['pad', 'unk']
 
     all_tokens = []
     # loop through each example
@@ -109,13 +109,13 @@ def preprocessing(dataset='train', rel_pos_mapper=None, deprel_mapper=None):
         rel_pos_mapper = None
         deprel_mapper = None
 
-    # also, create a preprocessed dataset to return (adding in bos and eos tokens)
+    # also, create a preprocessed dataset to return
     preprocessed_data = []
     for i in range(data_df.shape[0]):
         preprocessed_data.append({'text': data_df.text[i],
-                                  'rel_pos': ['bos'] + data_df.trel_pos[i] + ['eos'],
-                                  'deprel': ['bos'] + data_df.dep_label[i] + ['eos'],
-                                  'tokens': ['bos'] + all_tokens[i] + ['eos']})
+                                  'rel_pos': data_df.rel_pos[i],
+                                  'deprel': data_df.dep_label[i],
+                                  'tokens': all_tokens[i]})
 
     return preprocessed_data, rel_pos_mapper, deprel_mapper
 
@@ -245,15 +245,20 @@ def subword_cleaning(model_output, tokenizer, text, rel_pos_labels, deprel_label
 
     # loop through each sentence within the batch
     for i in range(len(text)):
-        # grab the bert tokens and the tensor outputs
-        bert_tokens = ['bos'] + tokenizer.tokenize(text[i]) + ['eos']
+        # grab the bert tokens and the tensor outputs (add CLS and SEP to match the tokenizer output)
+        bert_tokens = ['CLS'] + tokenizer.tokenize(text[i]) + ['SEP']
         rel_pos_pred = model_output[0][i]
         deprel_pred = model_output[1][i]
 
         # loop through each token and remove the subwords and hyphens from predictions
         new_bert_tokens = bert_tokens.copy()
         for j, token in enumerate(bert_tokens):
-            # find the tokens to remove within the bert_tokens
+            # first, find the CLS and SEP tokens to remove
+            if token == 'CLS':
+                new_bert_tokens[j] = '__dummy__'
+            if token == 'SEP':
+                new_bert_tokens[j] = '__dummy__'
+            # find the subwords and hyphen tokens to remove within the bert_tokens
             if '##' in token:
                 new_bert_tokens[j] = '__dummy__'
             if token == '-':
@@ -264,12 +269,10 @@ def subword_cleaning(model_output, tokenizer, text, rel_pos_labels, deprel_label
         # remove the tensors at the dummy indices within the predictions
         rel_pos_pred_list = []
         deprel_pred_list = []
-        # cleaned_bert_tokens = [] # DELETE LATER
         for j, token in enumerate(new_bert_tokens):
             if token != '__dummy__':
                 rel_pos_pred_list.append(rel_pos_pred[j].view(1, -1))
                 deprel_pred_list.append(deprel_pred[j].view(1, -1))
-                # cleaned_bert_tokens.append(token) # DELETE LATER
         rel_pos_pred = torch.cat(rel_pos_pred_list)
         deprel_pred = torch.cat(deprel_pred_list)
 
@@ -284,7 +287,6 @@ def subword_cleaning(model_output, tokenizer, text, rel_pos_labels, deprel_label
         elif target_max_length < rel_pos_pred.size(0):
             rel_pos_pred = rel_pos_pred[:target_max_length, :]
             deprel_pred = deprel_pred[:target_max_length, :]
-            # cleaned_bert_tokens = cleaned_bert_tokens[:target_max_length] # DELETE LATER
 
         rel_pos_preds.append(rel_pos_pred.to('cpu'))
         deprel_preds.append(deprel_pred.to('cpu'))

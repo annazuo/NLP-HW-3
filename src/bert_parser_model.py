@@ -22,23 +22,28 @@ def subword_cleaning(model_output, tokenizer, text, labels):
     Clean the model Bert tokenized outputs to remove subwords and hyphens (do on CPU to save GPU memory)
     '''
     # save the max length of the targets
-    target_max_length = labels.size(1)
+    target_max_length = len(labels)
 
     # initialize lists of tensors for predicted rel_pos and deprel in batch
     rel_pos_preds = []
     deprel_preds = []
 
-    # loop through each sentence within the batch
-    for i in range(len(text)):
-        # grab the bert tokens and the tensor outputs
-        bert_tokens = ['bos'] + tokenizer.tokenize(text[i]) + ['eos']
+    # loop through each sentence within the batch (put in 1 here since for part 3, we are running this unbatched)
+    for i in range(1):
+        # grab the bert tokens and the tensor outputs (add CLS and SEP to match the tokenizer output)
+        bert_tokens = ['CLS'] + tokenizer.tokenize(text) + ['SEP']
         rel_pos_pred = model_output[0][i]
         deprel_pred = model_output[1][i]
 
         # loop through each token and remove the subwords and hyphens from predictions
         new_bert_tokens = bert_tokens.copy()
         for j, token in enumerate(bert_tokens):
-            # find the tokens to remove within the bert_tokens
+            # first, find the CLS and SEP tokens to remove
+            if token == 'CLS':
+                new_bert_tokens[j] = '__dummy__'
+            if token == 'SEP':
+                new_bert_tokens[j] = '__dummy__'
+            # find the subwords and hyphen tokens to remove within the bert_tokens
             if '##' in token:
                 new_bert_tokens[j] = '__dummy__'
             if token == '-':
@@ -49,14 +54,12 @@ def subword_cleaning(model_output, tokenizer, text, labels):
         # remove the tensors at the dummy indices within the predictions
         rel_pos_pred_list = []
         deprel_pred_list = []
-        # cleaned_bert_tokens = [] # DELETE LATER
         for j, token in enumerate(new_bert_tokens):
             if token != '__dummy__':
-                rel_pos_pred_list.append(rel_pos_pred[j].view(1, -1))
-                deprel_pred_list.append(deprel_pred[j].view(1, -1))
-                # cleaned_bert_tokens.append(token) # DELETE LATER
-        rel_pos_pred = torch.cat(rel_pos_pred_list)
-        deprel_pred = torch.cat(deprel_pred_list)
+                rel_pos_pred_list.append(rel_pos_pred[j])
+                deprel_pred_list.append(deprel_pred[j])
+        rel_pos_pred = torch.stack(rel_pos_pred_list)
+        deprel_pred = torch.stack(deprel_pred_list)
 
         # if the cleaned tensor is shorter than target_max_length, pad the tensors with zeros up so that the dimension is target_max_length x vocab size
         # (Note: this shouldn't be a big issue since majority of these zeros will be ignored in the loss function since they fall at pad indices)
@@ -69,7 +72,6 @@ def subword_cleaning(model_output, tokenizer, text, labels):
         elif target_max_length < rel_pos_pred.size(0):
             rel_pos_pred = rel_pos_pred[:target_max_length, :]
             deprel_pred = deprel_pred[:target_max_length, :]
-            # cleaned_bert_tokens = cleaned_bert_tokens[:target_max_length] # DELETE LATER
 
         rel_pos_preds.append(rel_pos_pred.to('cpu'))
         deprel_preds.append(deprel_pred.to('cpu'))

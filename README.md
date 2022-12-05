@@ -19,26 +19,46 @@ Note: run finetuning for the 3 lambdas and save the model states by running the 
 See files included for bert-parser-0.25.pt, bert-parser-0.5.pt, bert-parser-0.75.pt
 
 For Lambda=0.25
-    Final Validation Relative Position Accuracy: 0.7051347919840629
-    Final Validation Dependency Accuracy: 0.8643302414001579
+    Final Validation Relative Position Accuracy: 0.6738846541651689
+    Final Validation Dependency Accuracy: 0.8483991252861763
 
 For Lambda=0.5
-    Final Validation Relative Position Accuracy: 0.7412188010194627
-    Final Validation Dependency Accuracy: 0.8563394005030497
+    Final Validation Relative Position Accuracy: 0.7206644352497926
+    Final Validation Dependency Accuracy: 0.8425029064018588
 
 For Lambda=0.75
-    Final Validation Relative Position Accuracy: 0.751309021218361
-    Final Validation Dependency Accuracy: 0.8222861255191293
+    Final Validation Relative Position Accuracy: 0.7359746412836106
+    Final Validation Dependency Accuracy: 0.8120889659776388
 
 ## Part 3
-For Validation Set:
-    For Lambda=0.25
+For Argmax Decoding:
+    For Validation Set:
+        For Lambda=0.25:
+            {'uas': 0.7151894713338056, 'las': 0.6801684958217957}
 
+        For Lambda=0.5:
+            {'uas': 0.7670725856515138, 'las': 0.7267341236821997}
 
-    For Lambda=0.5
-        
+        For Lambda=0.75:
+            {'uas': 0.7859685655561269, 'las': 0.7231893096101568}
 
-    For Lambda=0.75
+    For Test Set:
+        Select the best lambda based on UAS.
+        Best Lambda=0.75:
+            {'uas': 0.7959862650311601, 'las': 0.7266512149163995}
 
+For MST Decoding:
+    For Validation Set:
+        For Lambda=0.25:
+            {'uas': 0.6270472248723779, 'las': 0.5908511837271458}
 
-For Test Set:
+        For Lambda=0.5:
+            {'uas': 0.6729592700405519, 'las': 0.6324549475374733}
+
+        For Lambda=0.75:
+            {'uas': 0.6917713665581569, 'las': 0.6290348717052857}
+
+    For Test Set:
+        Select the best lambda based on UAS.
+        Best Lambda=0.75:
+            {'uas': 0.6919016000785577, 'las': 0.6225292247864233}

@@ -1,5 +1,5 @@
 from src.parsers.parser import Parser
-from src.dependency_parse import DependencyParse
+from src.dependency_parse import DependencyParse 
 import spacy
 
 class SpacyParser(Parser):

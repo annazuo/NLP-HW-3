@@ -1,7 +1,7 @@
-from src.dependency_parse import DependencyParse
+from src.dependency_parse import DependencyParse 
 
 
-def get_metrics(predicted: DependencyParse, labeled: DependencyParse) -> dict:
+def get_metrics(predicted: DependencyParse, labeled: DependencyParse):
     # get the predicted and labeled heads and dependencies
     pred_heads = predicted.heads
     label_heads = labeled.heads

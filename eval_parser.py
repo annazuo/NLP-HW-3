@@ -42,13 +42,13 @@ def parse_args():
     arg_parser = ArgumentParser()
     arg_parser.add_argument("method", choices=["spacy", "bert"])
     arg_parser.add_argument("--data_subset", type=str, default="en_gum")
-    arg_parser.add_argument("--test", action="store_false")
+    arg_parser.add_argument("--test", action="store_true")
     
     # SpaCy parser arguments.
     arg_parser.add_argument("--model_name", type=str, default="en_core_web_sm")
 
     # BERT parser arguments
-    arg_parser.add_argument("--model_path", type=str, default="bert-parser-0.25.pt")
+    arg_parser.add_argument("--model_path", type=str, default="bert-parser-0.75.pt")
     arg_parser.add_argument("--mst", type=bool, default=False)
 
     return arg_parser.parse_args()
