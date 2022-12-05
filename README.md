@@ -1,6 +1,13 @@
 # README
 
 ## Part 1
+#### Short Description of Code:
+To run the code, use the following command for the validation set:
+    python eval_parser.py spacy
+Also, use the following command for the test set:
+    python eval_parser.py spacy --test
+
+#### Results:
 For Validation Set:
     {'uas': 0.5748405017131534, 'las': 0.3480172399118694}
 
@@ -9,13 +16,27 @@ For Test Set:
 
 ## Part 2
 ### Part 2.1
-Note: run preprocessing and save files by running the following command line:
+#### Short Description of Code:
+In the finetune_bert.py file, the functions can be run in command line by running in the following format:
+    python finetune_bert.py function_name
+In my code, the preprocessing function (which calls the get_parses function) takes in a data subset and preprocesses it. To run preprocessing on all three subsets, we run the create_pp function.
+
+Run preprocessing save the files (train set, val set, test set, rel_pos vocab, deprel vocab) by running the following command line:
     python finetune_bert.py create_pp
+
+#### Results:
 See file included for en_gum_10.tsv
 
 ### Part 2.2
-Note: run finetuning for the 3 lambdas and save the model states by running the following command line:
+#### Short Description of Code:
+In the finetune_bert.py file, the functions can be run in command line by running in the following format:
+    python finetune_bert.py function_name
+In my code, the run_model function maps the targets to indices, creates dataloaders, and trains and evaluates the model by calling the FinetuneBert model class, and the following functions: map_to_idx, pad_list_of_tensors, pad_collate_fn, and subword_cleaning. To run the model on all three lambdas, we run the lambda_tuning function.
+
+Run finetuning for the 3 lambdas and save the model states by running the following command line:
     python finetune_bert.py lambda_tuning
+
+#### Results:
 See files included for bert-parser-0.25.pt, bert-parser-0.5.pt, bert-parser-0.75.pt
 
 For Lambda=0.25
@@ -31,6 +52,18 @@ For Lambda=0.75
     Final Validation Dependency Accuracy: 0.8120889659776388
 
 ## Part 3
+#### Short Description of Code:
+To run the code for Argmax Decoding, use the following command for the validation set:
+    python eval_parser.py bert 
+Also, use the following command for the test set:
+    python eval_parser.py bert --test
+
+To run the code for MST Decoding, use the following command for the validation set:
+    python eal_parser.py bert --mst True
+Also, use the following command for the test set:
+    python eval_parser.py bert --test --mst True
+
+#### Results:
 For Argmax Decoding:
     For Validation Set:
         For Lambda=0.25:
@@ -50,15 +83,15 @@ For Argmax Decoding:
 For MST Decoding:
     For Validation Set:
         For Lambda=0.25:
-            {'uas': 0.6270472248723779, 'las': 0.5908511837271458}
+            {'uas': 0.627935106407331, 'las': 0.5914486033180397}
 
         For Lambda=0.5:
-            {'uas': 0.6729592700405519, 'las': 0.6324549475374733}
+            {'uas': 0.6737543844169256, 'las': 0.6331115535074764}
 
         For Lambda=0.75:
-            {'uas': 0.6917713665581569, 'las': 0.6290348717052857}
+            {'uas': 0.6919389126132234, 'las': 0.6294586369525688}
 
     For Test Set:
         Select the best lambda based on UAS.
         Best Lambda=0.75:
-            {'uas': 0.6919016000785577, 'las': 0.6225292247864233}
+            {'uas': 0.6918453636151792, 'las': 0.6223462936936909}

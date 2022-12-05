@@ -68,7 +68,7 @@ class BertParser(Parser):
         # apply MST decoding
         if self.mst:
             # turn the logits from the matrix fo sentence_length x rel_vocab_size to log probabilities
-            rel_log_probs = F.softmax(cleaned_output_rel)
+            rel_log_probs = F.log_softmax(cleaned_output_rel)
 
             # invert the rel_pos vocab mapper
             rel_pos_vocab_inv = {v: k for k, v in rel_pos_vocab.items()}
