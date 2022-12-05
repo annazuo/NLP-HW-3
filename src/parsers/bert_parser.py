@@ -68,7 +68,7 @@ class BertParser(Parser):
         # apply MST decoding
         if self.mst:
             # turn the logits from the matrix fo sentence_length x rel_vocab_size to log probabilities
-            rel_log_probs = F.log_softmax(cleaned_output_rel)
+            rel_log_probs = F.log_softmax(cleaned_output_rel, dim=1)
 
             # invert the rel_pos vocab mapper
             rel_pos_vocab_inv = {v: k for k, v in rel_pos_vocab.items()}
@@ -97,7 +97,7 @@ class BertParser(Parser):
             MST = maximum_spanning_arborescence(G)
 
             # initialize a list for the head_preds with zeros (so if there's no valid edges, the node is a head with head=0)
-            head_preds = [0*i for i in range(len(tokens))]
+            head_preds = ['0'] * len(tokens)
 
             # for the MST, loop through the edges to fill in the head predictions
             mst_edges = MST.edges
